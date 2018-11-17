@@ -39,13 +39,9 @@ template<typename T> class Montogomery{
             return w>=n ? w-n : w;
         }
     public:
-        inline static bool is_modulo_too_large(const T modulo) noexcept {
-            constexpr auto r = static_cast<U>(1) << r_bits;
-            const auto m = static_cast<U>(modulo);
-            const auto t_max = (m-1)*(m-1);
-            const auto v_max = (r-1)*m;
-            const auto sum = t_max + v_max;
-            return sum < t_max || sum < v_max;
+        inline static bool is_modulo_too_large(const T modulo) noexcept{
+            const auto m1 = modulo-1;
+            return (m1+m1)<m1;
         }
         inline Montogomery(const T modulo, const T phi_modulo = 0) noexcept{
             n = modulo;
@@ -65,7 +61,7 @@ template<typename T> class Montogomery{
         }
         inline T add(const T a, const T b) const noexcept{
             const T c = a+b;
-            return c>n ? c-n : c;
+            return c>=n ? c-n : c;
         }
         inline T sub(const T a, const T b) const noexcept{
             const T c = a-b;
@@ -84,6 +80,7 @@ template<typename T> class Montogomery{
                     x = mul(x, y);
                 }
                 y = sqr(y);
+                n >>= 1;
             }
             return x;
         }
