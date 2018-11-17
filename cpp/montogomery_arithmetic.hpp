@@ -39,6 +39,11 @@ template<typename T> class Montogomery{
             return w>=n ? w-n : w;
         }
     public:
+        inline static bool is_modulo_too_large(const T modulo) noexcept {
+            constexpr double r = static_cast<U>(1) << r_bits;
+            const double m = modulo;
+            return (m-1)*(m-1)+(r-1)*m >= r*r;
+        }
         inline Montogomery(const T modulo, const T phi_modulo = 0) noexcept{
             n = modulo;
             np = calc_n_prime(modulo);
