@@ -2,12 +2,22 @@
 #include <climits>
 #include <cstdint>
 
-class Montogomery{
+namespace detail{
+    inline constexpr uint16_t double_width(uint8_t a){ return a; }
+    inline constexpr uint32_t double_width(uint16_t a){ return a; }
+    inline constexpr uint64_t double_width(uint32_t a){ return a; }
+    inline constexpr __uint128_t double_width(uint64_t a){ return a; }
+}
+
+template<typename T> using double_width = decltype(detail::double_width(static_cast<T>(0)));
+
+template<typename T> class Montogomery{
     private:
-        static constexpr size_t r_bits = 64;
+        static constexpr size_t r_bits = sizeof(T)*CHAR_BIT;
+        using U = double_width<T>;
         // nx \equiv -1 \pmod r
-        inline static uint64_t calc_n_prime(const uint64_t mod) noexcept{
-            uint64_t res = 0, t = 0, s = 1;
+        inline static T calc_n_prime(const T mod) noexcept{
+            T res = 0, t = 0, s = 1;
             for(size_t i=0; i<r_bits; i++){
                 if((t&1) == 0){
                     t += mod;
@@ -18,49 +28,49 @@ class Montogomery{
             }
             return res;
         }
-        uint64_t n;
-        uint64_t np;
-        uint64_t r2;
-        uint64_t phi;
-        uint64_t reduction(const __uint128_t t) const noexcept{
-            const auto u = static_cast<uint64_t>(t*np);
-            const auto v = static_cast<__uint128_t>(u)*static_cast<__uint128_t>(n);
-            const auto w = static_cast<uint64_t>((t+v) >> r_bits);
+        T n;
+        T np;
+        T r2;
+        T phi;
+        inline T reduction(const U t) const noexcept{
+            const auto u = static_cast<T>(t*np);
+            const auto v = static_cast<U>(u)*static_cast<U>(n);
+            const auto w = static_cast<T>((t+v) >> r_bits);
             return w>=n ? w-n : w;
         }
     public:
-        Montogomery(const uint64_t modulo, const uint64_t phi_modulo = 0) noexcept{
+        inline Montogomery(const T modulo, const T phi_modulo = 0) noexcept{
             n = modulo;
             np = calc_n_prime(modulo);
-            const auto rn = (static_cast<__uint128_t>(1) << r_bits) % static_cast<__uint128_t>(n);
-            r2 = static_cast<uint64_t>(rn * rn % n);
+            const auto rn = (static_cast<U>(1) << r_bits) % static_cast<U>(n);
+            r2 = static_cast<T>(rn * rn % n);
             phi = phi_modulo==0 ? modulo - 1 : phi_modulo;
         }
-        uint64_t convert(const uint64_t a) const noexcept{
-            return reduction(static_cast<__uint128_t>(a)*static_cast<__uint128_t>(r2));
+        inline T convert(const T a) const noexcept{
+            return reduction(static_cast<U>(a)*static_cast<U>(r2));
         }
-        uint64_t invert(const uint64_t a) const noexcept{
+        inline T invert(const T a) const noexcept{
             return reduction(a);
         }
-        uint64_t one() const noexcept{
-            return reduction(static_cast<__uint128_t>(r2));
+        inline T one() const noexcept{
+            return reduction(static_cast<U>(r2));
         }
-        uint64_t add(const uint64_t a, const uint64_t b) const noexcept{
-            const uint64_t c = a+b;
+        inline T add(const T a, const T b) const noexcept{
+            const T c = a+b;
             return c>n ? c-n : c;
         }
-        uint64_t sub(const uint64_t a, const uint64_t b) const noexcept{
-            const uint64_t c = a-b;
+        inline T sub(const T a, const T b) const noexcept{
+            const T c = a-b;
             return a<b ? c+n : c;
         }
-        uint64_t mul(const uint64_t a, const uint64_t b) const noexcept{
-            return reduction(static_cast<__uint128_t>(a)*static_cast<__uint128_t>(b));
+        inline T mul(const T a, const T b) const noexcept{
+            return reduction(static_cast<U>(a)*static_cast<U>(b));
         }
-        uint64_t sqr(const uint64_t a) const noexcept{
-            return reduction(static_cast<__uint128_t>(a)*static_cast<__uint128_t>(a));
+        inline T sqr(const T a) const noexcept{
+            return reduction(static_cast<U>(a)*static_cast<U>(a));
         }
-        uint64_t pow(const uint64_t a, uint64_t n) const noexcept{
-            uint64_t x=one(), y=a;
+        inline T pow(const T a, T n) const noexcept{
+            T x=one(), y=a;
             while(n>0){
                 if(n%2==1){
                     x = mul(x, y);
@@ -69,10 +79,10 @@ class Montogomery{
             }
             return x;
         }
-        uint64_t inv(const uint64_t a) const noexcept{
+        inline T inv(const T a) const noexcept{
             return pow(a, phi-1);
         }
-        uint64_t div(const uint64_t a, const uint64_t b) const noexcept{
+        inline T div(const T a, const T b) const noexcept{
             return mul(a, inv(b));
         }
 };
