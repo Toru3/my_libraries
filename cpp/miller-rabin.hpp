@@ -1,5 +1,5 @@
-#ifndef MILLER_RABIN_H
-#define MILLER_RABIN_H
+#ifndef MILLER_RABIN_HPP
+#define MILLER_RABIN_HPP
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
