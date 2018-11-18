@@ -1,3 +1,5 @@
+#ifndef MONTOGOMERY_ARITHMETIC_HPP
+#define MONTOGOMERY_ARITHMETIC_HPP
 #include <cstddef>
 #include <climits>
 #include <cstdint>
@@ -91,3 +93,4 @@ template<typename T> class Montogomery{
             return mul(a, inv(b));
         }
 };
+#endif
