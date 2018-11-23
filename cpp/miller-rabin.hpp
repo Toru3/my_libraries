@@ -57,5 +57,9 @@ namespace MillerRabinPrimalityTest{
         }
         return true;
     }
+
+    inline bool is_prime(const uint64_t n) noexcept{
+        return miller_rabin_primality_test(n);
+    }
 }
 #endif
