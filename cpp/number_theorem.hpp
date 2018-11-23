@@ -4,7 +4,7 @@
 #include <tuple>
 namespace NumberTheorem{
     /// binary GCD algorithm (Stein's algorithm)
-    template<typename T> inline T gcd(T a, T b){
+    template<typename T> inline T gcd(T a, T b) noexcept{
         if(a==0) return b;
         if(b==0) return a;
         a = a<0 ? -a : a;
@@ -32,7 +32,7 @@ namespace NumberTheorem{
         return shift*a;
     }
     /// solve ax+by=gcd(a,b)
-    template<typename T> inline std::tuple<T, T, T> extended_euclidean_algorithm(const T& a, const T& b){
+    template<typename T> inline std::tuple<T, T, T> extended_euclidean_algorithm(const T& a, const T& b) noexcept{
         if(a==0){
             return std::make_tuple(b, 0, 1);
         }
