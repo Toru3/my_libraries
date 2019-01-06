@@ -10,7 +10,7 @@ pub fn gcd<T: num::Zero + for<'x> std::ops::RemAssign<&'x T>>(mut a: T, mut b: T
 /// out (g, x, y)
 pub fn extended_euclidean_algorithm<T>(a: T, b: T) -> (T, T, T)
 where
-    T: num::Zero + num::One + for<'x> std::ops::RemAssign<&'x T> + std::ops::SubAssign,
+    for<'x> T: num::Zero + num::One + std::ops::RemAssign<&'x T> + std::ops::SubAssign<&'x T>,
     for<'x> &'x T: std::ops::Mul<Output = T> + std::ops::Div<Output = T>,
 {
     let mut old = (a, T::one(), T::zero());
@@ -18,8 +18,8 @@ where
     while !now.0.is_zero() {
         let q = &old.0 / &now.0;
         old.0 %= &now.0;
-        old.1 -= &q * &now.1;
-        old.2 -= &q * &now.2;
+        old.1 -= &(&q * &now.1);
+        old.2 -= &(&q * &now.2);
         std::mem::swap(&mut old, &mut now);
     }
     old
