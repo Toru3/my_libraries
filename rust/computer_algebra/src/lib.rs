@@ -1,3 +1,5 @@
+pub mod polynomial;
+
 pub fn gcd<T: num::Zero + for<'x> std::ops::RemAssign<&'x T>>(mut a: T, mut b: T) -> T {
     while !b.is_zero() {
         a %= &b;
@@ -39,12 +41,12 @@ mod tests {
     #[test]
     fn eea_test() {
         let f = |a, b| {
-            let (g, x, y) = crate::extended_euclidean_algorithm(a, b);
+            let (g, x, y) = crate::extended_euclidean_algorithm::<i128>(a, b);
             assert_eq!(a * x + b * y, g);
         };
         f(5, 8);
         f(45645, 43276);
         f(21465, 31497);
-        f(214654i64, 312497i64);
+        f(214654, 312497);
     }
 }
